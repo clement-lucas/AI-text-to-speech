@@ -6,8 +6,8 @@ Import-Module Az.Accounts
 
 # 変数を設定 — resourceName は Azure ポータルで確認できる Speech リソース名
 $resourceName = "aif-legacymodernize"
-$inDir  = ".\\work-ssml"
-$outDir = ".\\work-audio"
+$inDir  = ".\\ssml"
+$outDir = ".\\audio"
 New-Item -ItemType Directory -Force -Path $outDir | Out-Null
 
 # Entra ID (Azure AD) トークンを取得

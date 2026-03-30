@@ -1,6 +1,11 @@
 # Azure AI Speech – PowerShell TTS Batch Script
 
 Batch-convert SSML files to WAV audio using the [Azure AI Speech](https://learn.microsoft.com/azure/ai-services/speech-service/) REST API.  
+
+Sample use case:
+ - Create audio narrations for PowerPoint slides by writing SSML files with the desired text, voice, and prosody settings.
+ - Then run the script to generate WAV files for each slide.
+ - Useful when you want to generate audio for multiple slides or content pieces at once.
 Two authentication methods are provided — choose the one that fits your environment.
 
 ## Repository Structure
@@ -62,7 +67,7 @@ No additional modules are required.
 
 ### Configuration
 
-Open `pptspeech-apikey.ps1` and set the two variables at the top:
+Open `text-to-speech-apikey.ps1` and set the two variables at the top:
 
 ```powershell
 $region = "<YOUR-REGION>"       # e.g. "swedencentral"
@@ -72,8 +77,18 @@ $apiKey = "<YOUR-API-KEY>"      # Key 1 or Key 2 from the Azure Portal
 ### Run
 
 ```powershell
-.\pptspeech-apikey.ps1
+.\text-to-speech-apikey.ps1
 ```
+
+A progress bar shows the current file and overall progress.  
+If a WAV file already exists, you will be prompted to choose:
+
+| Key | Action |
+|-----|--------|
+| **S** | Skip this file |
+| **O** | Overwrite this file |
+| **A** | Skip All remaining duplicates |
+| **L** | Overwrite All remaining duplicates |
 
 > **Note:** The API key method uses the regional endpoint  
 > `https://<region>.tts.speech.microsoft.com/cognitiveservices/v1`
@@ -124,7 +139,7 @@ It authenticates with your Azure AD / Entra ID identity via a Bearer token.
 
 ### Configuration
 
-Open `pptspeech-entraid.ps1` and set the variable at the top:
+Open `text-to-speech-entraid.ps1` and set the variable at the top:
 
 ```powershell
 $resourceName = "<YOUR-SPEECH-RESOURCE-NAME>"   # e.g. "my-speech-resource"
@@ -133,8 +148,18 @@ $resourceName = "<YOUR-SPEECH-RESOURCE-NAME>"   # e.g. "my-speech-resource"
 ### Run
 
 ```powershell
-.\pptspeech-entraid.ps1
+.\text-to-speech-entraid.ps1
 ```
+
+A progress bar shows the current file and overall progress.  
+If a WAV file already exists, you will be prompted to choose:
+
+| Key | Action |
+|-----|--------|
+| **S** | Skip this file |
+| **O** | Overwrite this file |
+| **A** | Skip All remaining duplicates |
+| **L** | Overwrite All remaining duplicates |
 
 > **Note:** The Entra ID method uses the custom-domain endpoint  
 > `https://<resource-name>.cognitiveservices.azure.com/tts/cognitiveservices/v1`
