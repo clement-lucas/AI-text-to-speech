@@ -1,0 +1,7 @@
+<speak version="1.0" xml:lang="ja-JP">
+  <voice name="ja-JP-NanamiNeural">
+    <prosody rate="0%" pitch="0%">
+      このスライドでは具体的なGitHub Copilot Modernizationワークフローが表示されます。まずポートフォリオ評価で対象を整理し、GitHub Issuesなどで作業を分解します。次にCopilotがアップグレード計画を作り、依存関係や修正ポイントを明確化します。アップグレード、移行、コンテナ化、テストやCVE対応まで、段階的なコミットとして提案されるので、開発者はレビューしながら安全に進められます。つまり、近代化を“巨大な一括作業”から“管理可能な小さなステップ”に変えるのがポイントです。
+    </prosody>
+  </voice>
+</speak>

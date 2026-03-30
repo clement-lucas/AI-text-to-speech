@@ -1,0 +1,7 @@
+<speak version="1.0" xml:lang="ja-JP">
+  <voice name="ja-JP-NanamiNeural">
+    <prosody rate="0%" pitch="0%">
+      ここでは、Azure Copilot を システム管理者の入口に、GitHub Copilot modernization を開発者の入口に据えた、全体のエージェント体験をまとめています。発見、評価、計画、移行、コード改修、セキュリティ確認、最適化、運用監視までが一つの流れとしてつながっています。Microsoftが提供するのは個別ツールの寄せ集めではなく、統合的なモダナイゼーション体験となります。お客様の組織は、IT、開発、運用、セキュリティで分かれていることが多いですが、Microsoft の強みはその分断をまたげる点です。Azure Copilot と GitHub Copilot modernization が連携することで、ITと開発が同じゴールに向かって並走できる状態を作れます。これが、Microsoft のモダナイゼーション戦略の大きな差別化ポイントになります。
+    </prosody>
+  </voice>
+</speak>

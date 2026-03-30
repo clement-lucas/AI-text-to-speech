@@ -1,0 +1,7 @@
+<speak version="1.0" xml:lang="ja-JP">
+  <voice name="ja-JP-NanamiNeural">
+    <prosody rate="0%" pitch="0%">
+      Microsoft の大きな差別化ポイントは、IT 部門向けの Azure Copilot と、開発者向けの GitHub Copilot をつなぎ、エンドツーエンドでモダナイゼーションを進められることです。Azure 側では発見、評価、移行、運用最適化を支援し、GitHub 側ではコード分析、改修、テスト、デプロイを支援します。インフラ担当と開発担当が一つのストーリーでつなげられる点が非常に強い価値になります。多くのお客様では、インフラ更改とアプリ刷新が別プロジェクトになりがちですが、 Microsoft なら、その断絶を埋めて、ひとつの変革計画として進めることが強みです。
+    </prosody>
+  </voice>
+</speak>

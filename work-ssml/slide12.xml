@@ -1,0 +1,7 @@
+<speak version="1.0" xml:lang="ja-JP">
+  <voice name="ja-JP-NanamiNeural">
+    <prosody rate="0%" pitch="0%">
+      Azure Copilot の migration agent は、オンプレミスや他クラウドにある資産の発見から、ROI 分析、さらに landing zone の準備までを大幅に高速化します。従来は数日から数週間かかっていた初期評価を、より短時間で進められるようになるのが特徴です。アーキテクチャや目的を会話型自然言語で伝えると、Microsoft の Cloud Adoption Framework ガイドラインに沿ったLanding Zoneのテンプレート生成につながります。加えてLinuxディストリやOSS DBの対応を広げ、必要に応じてGitHub Copilotとの連携で“より深い”モダナイゼーションが可能となります。
+    </prosody>
+  </voice>
+</speak>

@@ -1,9 +1,5 @@
 # Work folder and script
-pptspeech.ps1
-work-audio/
 work-audio/*
-work-ssml/
-work-ssml/*
 
 # Do not commit API keys or personal config
 # If you copy a script and hard-code secrets, keep it local

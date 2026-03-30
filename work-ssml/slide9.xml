@@ -1,0 +1,7 @@
+<speak version="1.0" xml:lang="ja-JP">
+  <voice name="ja-JP-NanamiNeural">
+    <prosody rate="0%" pitch="0%">
+      このスライドは、発見からデプロイまでをエージェントでつなぐ流れです。まずAssessで資産棚卸しとビジネスケース、Planで依存関係マッピングとアセスメント、ExecuteでAIによるコード変換や移行の実行、Observeで継続的に運用最適化を行います。これは単発の診断ツールではなく、お客様の変革ジャーニー全体を前に進める connected experience であり、提案の入口は assessment でも、その先に landing zone、移行、コード改修、運用改善まで広げられる新しい進め方です。
+    </prosody>
+  </voice>
+</speak>

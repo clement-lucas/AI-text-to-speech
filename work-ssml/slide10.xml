@@ -1,0 +1,7 @@
+<speak version="1.0" xml:lang="ja-JP">
+  <voice name="ja-JP-NanamiNeural">
+    <prosody rate="0%" pitch="0%">
+      このスライドではAIエージェントが効く代表的なユースケースが挙げられます。.NETとJavaではレガシーフレームワーク更新とPaaS移行。VMwareでは推奨とランディングゾーン自動化で迅速な移行。SQL Serverは最小限の変更でIaaS/PaaS判断とサイジング。Linuxは統合運用と近代化。ITとSecurity Opsは監視・調査・自動修復。さらにOracleやPostgreSQLもVS Codeでのツール連携で近代化を支援します。インフラ、アプリ、データベース、運用改善を横断した提案に広げ、お客様の課題ごとに入口を変えながら、最終的には Azure 全体の価値に結びつけられる点が大きなポイントです。共通する価値は、“速く、安全に、確実に”。これを部門横断で成立させるのが次のスライドです。
+    </prosody>
+  </voice>
+</speak>

@@ -1,0 +1,7 @@
+<speak version="1.0" xml:lang="ja-JP">
+  <voice name="ja-JP-NanamiNeural">
+    <prosody rate="0%" pitch="0%">
+      さらに、Microsoftではメインフレーム領域に対しても Mainframe Modernization Agents という形でアプローチを広げています。COBOL などのレガシー資産を解析し、構造を理解し、クラウドに適した Java や .NET への変換を支援します。ここでのポイントは、すべてを自動化してブラックボックス化するのではなく、人が確認しながら進める human in the loop の設計になっていることです。メインフレーム案件は金額規模も大きい一方で、失敗リスクへの懸念も強い領域です。メインフレームの技術的難易度だけではなく、今ではCOBOLの様な古い専門知識を持つ人材が不足しているのが課題です。だからこそ、AI のナレッジ・スピードと人による確認・判断の両立が活躍できる領域でもあります。
+    </prosody>
+  </voice>
+</speak>
