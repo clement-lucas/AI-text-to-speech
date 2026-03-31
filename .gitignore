@@ -2,6 +2,7 @@
 temp/
 temp/*
 pptspeech.ps1
+avatar-entraid-test.ps1
 
 # Do not commit API keys or personal config
 # If you copy a script and hard-code secrets, keep it local

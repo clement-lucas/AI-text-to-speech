@@ -1,21 +1,25 @@
-# Azure AI Speech – PowerShell TTS Batch Script
+# Azure AI Speech – PowerShell TTS & Avatar Batch Scripts
 
-Batch-convert SSML files to WAV audio using the [Azure AI Speech](https://learn.microsoft.com/azure/ai-services/speech-service/) REST API.  
+Batch-convert SSML files to **WAV audio** or **avatar video** using the [Azure AI Speech](https://learn.microsoft.com/azure/ai-services/speech-service/) REST API.  
 
-Sample use case:
+Sample use cases:
  - Create audio narrations for PowerPoint slides by writing SSML files with the desired text, voice, and prosody settings.
- - Then run the script to generate WAV files for each slide.
- - Useful when you want to generate audio for multiple slides or content pieces at once.
-Two authentication methods are provided — choose the one that fits your environment.
+ - Generate **talking avatar videos** — a photorealistic human speaking your text — for presentations, training materials, or advertisements.
+ - Useful when you want to generate audio or video for multiple slides or content pieces at once.
+
+Two authentication methods are provided for each feature — choose the one that fits your environment.
 
 ## Repository Structure
 
 ```
-├── pptspeech-apikey.ps1      # Script using API Key authentication
-├── pptspeech-entraid.ps1     # Script using Microsoft Entra ID authentication
-├── ssml/                     # Input  – place your SSML XML files here
-│   └── sample.xml            # Example SSML file
-└── audio/                    # Output – generated WAV files (auto-created)
+├── text-to-speech-apikey.ps1   # TTS script – API Key authentication
+├── text-to-speech-entraid.ps1  # TTS script – Entra ID authentication
+├── avatar-apikey.ps1           # Avatar script – API Key authentication
+├── avatar-entraid.ps1          # Avatar script – Entra ID authentication
+├── ssml/                       # Input  – place your SSML XML files here
+│   └── sample.xml              # Example SSML file
+├── audio/                      # Output – generated WAV files (auto-created)
+└── video/                      # Output – generated avatar MP4 videos (auto-created)
 ```
 
 ## Prerequisites
@@ -57,7 +61,9 @@ Example (`ssml/sample.xml`):
 
 ---
 
-## Option 1 – API Key Authentication
+## Text-to-Speech Scripts
+
+### Option 1 – API Key Authentication
 
 This is the simplest method. It uses the API key from the Speech resource directly.
 
@@ -95,7 +101,7 @@ If a WAV file already exists, you will be prompted to choose:
 
 ---
 
-## Option 2 – Microsoft Entra ID Authentication
+### Option 2 – Microsoft Entra ID Authentication
 
 Use this method when API key authentication is disabled on the resource (e.g. enforced by organizational policy).  
 It authenticates with your Azure AD / Entra ID identity via a Bearer token.
@@ -166,7 +172,110 @@ If a WAV file already exists, you will be prompted to choose:
 
 ---
 
-## Output
+## Avatar Video Scripts
+
+The avatar scripts generate **talking avatar videos** — a photorealistic CG human speaking your SSML text.  
+They use the [Azure AI Speech Avatar Batch Synthesis API](https://learn.microsoft.com/azure/ai-services/speech-service/batch-synthesis-avatar) (asynchronous: submit job → poll status → download video).
+
+### Avatar Types
+
+| Type | Description | `$avatarCustomized` | `$avatarStyle` |
+|---|---|---|---|
+| **Standard video avatar** | Pre-built characters with multiple styles (e.g. Lisa, Harry) at 1920×1080 | `$false` | Required |
+| **Standard photo avatar** | Pre-built photo-based characters (e.g. Adrian, Amara) at 512×512 | `$false` | Not needed (leave empty) |
+| **Custom photo avatar** | Your own avatar created from a real person's photo | `$true` | Not needed |
+
+#### Standard Video Avatars (with styles)
+
+| Character | Styles |
+|---|---|
+| Harry | business, casual, youthful |
+| Jeff | business, formal |
+| Lisa | casual-sitting, graceful-sitting, graceful-standing, technical-sitting, technical-standing |
+| Lori | casual, graceful, formal |
+| Max | business, casual, formal |
+| Meg | formal, casual, business |
+
+#### Standard Photo Avatars (no style needed)
+
+Adrian, Amara, Amira, Anika, Bianca, Camila, Carlos, Clara, Darius, Diego, Elise, Farhan, Faris, Gabrielle, Hyejin, Imran, Isabella, Layla, Liwei, Ling, Marcus, Matteo, Rahul, Rana, Ren, Riya, Sakura, Simone, Zayd, Zoe
+
+#### Custom Photo Avatar (from a real person's photo)
+
+Creating a custom photo avatar requires a manual process with Microsoft:
+
+1. **Apply for limited access** via the [intake form](https://aka.ms/customneural).
+2. **Record a consent video** — the real person shown in the photo must provide verbal consent.
+3. **Submit the photo and consent** to Microsoft, who will create the avatar model for you.
+4. Once Microsoft has created the model, use its name as `$avatarCharacter` and set `$avatarCustomized = $true`.
+
+> See [Custom text to speech avatar](https://learn.microsoft.com/azure/ai-services/speech-service/custom-avatar-create) for full details.
+
+### Option 3 – Avatar with API Key Authentication
+
+#### Configuration
+
+Open `avatar-apikey.ps1` and set the variables at the top:
+
+```powershell
+$region          = "<YOUR-REGION>"      # e.g. "swedencentral"
+$apiKey          = "<YOUR-API-KEY>"     # Key 1 or Key 2
+$avatarCharacter = "lisa"               # Character name (see tables above)
+$avatarStyle     = "graceful-sitting"   # Style (video avatars only)
+$avatarCustomized = $false              # $true for custom photo avatar
+$videoFormat     = "mp4"                # "mp4" or "webm"
+$videoCodec      = "h264"              # "h264", "hevc", "vp9", or "av1"
+$backgroundColor = "#00000000"          # RRGGBBAA (transparent by default)
+$subtitleType    = "soft_embedded"      # "soft_embedded", "hard_embedded", "external_file", or "none"
+```
+
+#### Run
+
+```powershell
+.\avatar-apikey.ps1
+```
+
+### Option 4 – Avatar with Entra ID Authentication
+
+Requires the same setup as the Entra ID TTS script above (Az.Accounts module, `Connect-AzAccount`, RBAC role, custom domain).
+
+#### Configuration
+
+Open `avatar-entraid.ps1` and set the variables at the top:
+
+```powershell
+$resourceName    = "<YOUR-SPEECH-RESOURCE-NAME>"
+$avatarCharacter = "lisa"
+$avatarStyle     = "graceful-sitting"
+$avatarCustomized = $false
+$videoFormat     = "mp4"
+$videoCodec      = "h264"
+$backgroundColor = "#00000000"
+$subtitleType    = "soft_embedded"
+```
+
+#### Run
+
+```powershell
+.\avatar-entraid.ps1
+```
+
+### Avatar Output
+
+Generated videos are saved in the `video/` folder:
+
+```
+ssml/slide1.xml  →  video/slide1.mp4
+ssml/slide2.xml  →  video/slide2.mp4
+```
+
+Both avatar scripts display a progress bar and prompt on duplicate files, just like the TTS scripts.
+
+> **Note:** Avatar batch synthesis is **asynchronous**. Each file submits a job and the script polls every 10 seconds until the video is ready. This is slower than TTS but produces video output.
+
+---
+
+## TTS Output
 
 Generated WAV files are saved in the `audio/` folder with the same base name as the input SSML file:
 
@@ -185,7 +294,8 @@ See [supported audio formats](https://learn.microsoft.com/azure/ai-services/spee
 |---|---|---|
 | **Ease of setup** | Simple — just paste the key | Requires module install, login, and RBAC |
 | **Security** | Key can be leaked if committed to source control | No secrets in code — uses identity-based auth |
-| **Endpoint** | Regional (`<region>.tts.speech.microsoft.com`) | Custom domain (`<name>.cognitiveservices.azure.com`) |
+| **Endpoint (TTS)** | Regional (`<region>.tts.speech.microsoft.com`) | Custom domain (`<name>.cognitiveservices.azure.com`) |
+| **Endpoint (Avatar)** | Regional (`<region>.api.cognitive.microsoft.com`) | Custom domain (`<name>.cognitiveservices.azure.com`) |
 | **Custom domain required** | No | Yes |
 | **RBAC role required** | No | Yes — "Cognitive Services Speech User" |
 | **Works when API keys disabled** | No | Yes |
