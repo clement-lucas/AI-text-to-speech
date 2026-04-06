@@ -1,8 +1,8 @@
 # Temporary folder and script
-temp/
-temp/*
-pptspeech.ps1
-avatar-entraid-test.ps1
+ps-scripts/temp/
+ps-scripts/temp/*
+ps-scripts/pptspeech.ps1
+ps-scripts/avatar-entraid-test.ps1
 
 # Do not commit API keys or personal config
 # If you copy a script and hard-code secrets, keep it local

@@ -37,10 +37,7 @@ This repository also includes standalone **PowerShell scripts** for batch-conver
 
 ## Prerequisites
 
-- An **Azure AI Speech** resource in your Azure subscription
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) or later (for PptNarrator)
-
-### Create an Azure AI Speech Resource
+### 1. Azure AI Speech Resource
 
 1. Open the [Azure Portal](https://portal.azure.com/) and create an **Azure AI Speech** resource  
    (**Create a resource → AI + Machine Learning → Speech**).
@@ -49,17 +46,81 @@ This repository also includes standalone **PowerShell scripts** for batch-conver
 
    | Value | Where to find it | Used by |
    |---|---|---|
-   | **Region** | Overview / Keys and Endpoint | API Key auth |
-   | **Key 1** or **Key 2** | Keys and Endpoint | API Key auth |
-   | **Resource name** | Resource name at the top of the Overview page | Entra ID auth |
+   | **Region** | Overview / Keys and Endpoint | API Key script |
+   | **Key 1** or **Key 2** | Keys and Endpoint | API Key script |
+   | **Resource name** | Resource name at the top of the Overview page | Entra ID script |
 
 4. **If you plan to use Entra ID authentication**, you must also enable a **Custom domain** on the resource:
    - Go to **Networking → Custom domain name** and set a unique subdomain.
    - Once enabled, the endpoint becomes `https://<resource-name>.cognitiveservices.azure.com`.
 
-### Entra ID Setup (optional)
+### 2. SSML Input Files
 
-If you prefer identity-based authentication (no API keys), complete these additional steps:
+Place one or more `.xml` files in the `ps-scripts/ssml/` folder. Each file must contain valid [SSML](https://learn.microsoft.com/azure/ai-services/speech-service/speech-synthesis-markup-structure).
+
+Example (`ps-scripts/ssml/sample.xml`):
+
+```xml
+<speak version="1.0" xml:lang="en-US">
+  <voice name="en-US-JennyNeural">
+    <prosody rate="0%" pitch="0%">
+      Hello! This is a sample SSML file for Azure AI Speech text-to-speech.
+    </prosody>
+  </voice>
+</speak>
+```
+
+> A full list of available voices can be found in the [Voice Gallery](https://speech.microsoft.com/portal/voicegallery).
+
+---
+
+## Text-to-Speech Scripts
+
+### Option 1 – API Key Authentication
+
+This is the simplest method. It uses the API key from the Speech resource directly.
+
+### Setup
+
+No additional modules are required.
+
+### Configuration
+
+Open `ps-scripts/text-to-speech-apikey.ps1` and set the two variables at the top:
+
+```powershell
+$region = "<YOUR-REGION>"       # e.g. "swedencentral"
+$apiKey = "<YOUR-API-KEY>"      # Key 1 or Key 2 from the Azure Portal
+```
+
+### Run
+
+```powershell
+cd ps-scripts
+.\text-to-speech-apikey.ps1
+```
+
+A progress bar shows the current file and overall progress.  
+If a WAV file already exists, you will be prompted to choose:
+
+| Key | Action |
+|-----|--------|
+| **S** | Skip this file |
+| **O** | Overwrite this file |
+| **A** | Skip All remaining duplicates |
+| **L** | Overwrite All remaining duplicates |
+
+> **Note:** The API key method uses the regional endpoint  
+> `https://<region>.tts.speech.microsoft.com/cognitiveservices/v1`
+
+---
+
+### Option 2 – Microsoft Entra ID Authentication
+
+Use this method when API key authentication is disabled on the resource (e.g. enforced by organizational policy).  
+It authenticates with your Azure AD / Entra ID identity via a Bearer token.
+
+### Setup
 
 1. **Install the Az.Accounts PowerShell module** (one-time):
 
@@ -93,10 +154,158 @@ If you prefer identity-based authentication (no API keys), complete these additi
    - Role: **Cognitive Services Speech User**
    - Assign to your user account.
 
-4. **Enable a Custom domain** on the Speech resource (see above).  
+4. **Enable a Custom domain** on the Speech resource (see Prerequisites above).  
    Entra ID authentication **only works with the custom-domain endpoint** — NOT the regional endpoint.
 
-### Authentication Comparison
+### Configuration
+
+Open `ps-scripts/text-to-speech-entraid.ps1` and set the variable at the top:
+
+```powershell
+$resourceName = "<YOUR-SPEECH-RESOURCE-NAME>"   # e.g. "my-speech-resource"
+```
+
+### Run
+
+```powershell
+cd ps-scripts
+.\text-to-speech-entraid.ps1
+```
+
+A progress bar shows the current file and overall progress.  
+If a WAV file already exists, you will be prompted to choose:
+
+| Key | Action |
+|-----|--------|
+| **S** | Skip this file |
+| **O** | Overwrite this file |
+| **A** | Skip All remaining duplicates |
+| **L** | Overwrite All remaining duplicates |
+
+> **Note:** The Entra ID method uses the custom-domain endpoint  
+> `https://<resource-name>.cognitiveservices.azure.com/tts/cognitiveservices/v1`
+
+---
+
+## Avatar Video Scripts
+
+The avatar scripts generate **talking avatar videos** — a photorealistic CG human speaking your SSML text.  
+They use the [Azure AI Speech Avatar Batch Synthesis API](https://learn.microsoft.com/azure/ai-services/speech-service/batch-synthesis-avatar) (asynchronous: submit job → poll status → download video).
+
+### Avatar Types
+
+| Type | Description | `$avatarCustomized` | `$avatarStyle` |
+|---|---|---|---|
+| **Standard video avatar** | Pre-built characters with multiple styles (e.g. Lisa, Harry) at 1920×1080 | `$false` | Required |
+| **Standard photo avatar** | Pre-built photo-based characters (e.g. Adrian, Amara) at 512×512 | `$false` | Not needed (leave empty) |
+| **Custom photo avatar** | Your own avatar created from a real person's photo | `$true` | Not needed |
+
+#### Standard Video Avatars (with styles)
+
+| Character | Styles |
+|---|---|
+| Harry | business, casual, youthful |
+| Jeff | business, formal |
+| Lisa | casual-sitting, graceful-sitting, graceful-standing, technical-sitting, technical-standing |
+| Lori | casual, graceful, formal |
+| Max | business, casual, formal |
+| Meg | formal, casual, business |
+
+#### Standard Photo Avatars (no style needed)
+
+Adrian, Amara, Amira, Anika, Bianca, Camila, Carlos, Clara, Darius, Diego, Elise, Farhan, Faris, Gabrielle, Hyejin, Imran, Isabella, Layla, Liwei, Ling, Marcus, Matteo, Rahul, Rana, Ren, Riya, Sakura, Simone, Zayd, Zoe
+
+#### Custom Photo Avatar (from a real person's photo)
+
+Creating a custom photo avatar requires a manual process with Microsoft:
+
+1. **Apply for limited access** via the [intake form](https://aka.ms/customneural).
+2. **Record a consent video** — the real person shown in the photo must provide verbal consent.
+3. **Submit the photo and consent** to Microsoft, who will create the avatar model for you.
+4. Once Microsoft has created the model, use its name as `$avatarCharacter` and set `$avatarCustomized = $true`.
+
+> See [Custom text to speech avatar](https://learn.microsoft.com/azure/ai-services/speech-service/custom-avatar-create) for full details.
+
+### Option 3 – Avatar with API Key Authentication
+
+#### Configuration
+
+Open `ps-scripts/avatar-apikey.ps1` and set the variables at the top:
+
+```powershell
+$region          = "<YOUR-REGION>"      # e.g. "swedencentral"
+$apiKey          = "<YOUR-API-KEY>"     # Key 1 or Key 2
+$avatarCharacter = "lisa"               # Character name (see tables above)
+$avatarStyle     = "graceful-sitting"   # Style (video avatars only)
+$avatarCustomized = $false              # $true for custom photo avatar
+$videoFormat     = "mp4"                # "mp4" or "webm"
+$videoCodec      = "h264"              # "h264", "hevc", "vp9", or "av1"
+$backgroundColor = "#00000000"          # RRGGBBAA (transparent by default)
+$subtitleType    = "soft_embedded"      # "soft_embedded", "hard_embedded", "external_file", or "none"
+```
+
+#### Run
+
+```powershell
+cd ps-scripts
+.\avatar-apikey.ps1
+```
+
+### Option 4 – Avatar with Entra ID Authentication
+
+Requires the same setup as the Entra ID TTS script above (Az.Accounts module, `Connect-AzAccount`, RBAC role, custom domain).
+
+#### Configuration
+
+Open `ps-scripts/avatar-entraid.ps1` and set the variables at the top:
+
+```powershell
+$resourceName    = "<YOUR-SPEECH-RESOURCE-NAME>"
+$avatarCharacter = "lisa"
+$avatarStyle     = "graceful-sitting"
+$avatarCustomized = $false
+$videoFormat     = "mp4"
+$videoCodec      = "h264"
+$backgroundColor = "#00000000"
+$subtitleType    = "soft_embedded"
+```
+
+#### Run
+
+```powershell
+cd ps-scripts
+.\avatar-entraid.ps1
+```
+
+### Avatar Output
+
+Generated videos are saved in the `ps-scripts/video/` folder:
+
+```
+ps-scripts/ssml/slide1.xml  →  ps-scripts/video/slide1.mp4
+ps-scripts/ssml/slide2.xml  →  ps-scripts/video/slide2.mp4
+```
+
+Both avatar scripts display a progress bar and prompt on duplicate files, just like the TTS scripts.
+
+> **Note:** Avatar batch synthesis is **asynchronous**. Each file submits a job and the script polls every 10 seconds until the video is ready. This is slower than TTS but produces video output.
+
+---
+
+## TTS Output
+
+Generated WAV files are saved in the `ps-scripts/audio/` folder with the same base name as the input SSML file:
+
+```
+ps-scripts/ssml/slide1.xml  →  ps-scripts/audio/slide1.wav
+ps-scripts/ssml/slide2.xml  →  ps-scripts/audio/slide2.wav
+```
+
+The default output format is `riff-16khz-16bit-mono-pcm` (16 kHz, 16-bit, mono PCM WAV).  
+You can change the `X-Microsoft-OutputFormat` header in the script to use a different format.  
+See [supported audio formats](https://learn.microsoft.com/azure/ai-services/speech-service/rest-text-to-speech#audio-outputs) for all options.
+
+## Authentication Comparison
 
 | | API Key | Entra ID |
 |---|---|---|
@@ -110,7 +319,22 @@ If you prefer identity-based authentication (no API keys), complete these additi
 
 ---
 
-## PptNarrator
+## PptNarrator – Console App
+
+**PptNarrator** is a .NET 8 console app that automates the entire narration workflow:
+
+1. Reads **speaker notes** from each slide in a PowerPoint file  
+2. Generates **audio (WAV)** or **avatar video (MP4)** for each slide using Azure AI Speech  
+3. Embeds the media directly into a **copy** of the PPTX so it **auto-plays during slideshow**
+
+The original file is never modified — a new file with `-narrated` in the name is created.
+
+### Prerequisites
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0) or later  
+- An **Azure AI Speech** resource (same resource used by the PowerShell scripts above)  
+- For **Entra ID** auth: sign in via `az login` first  
+- For **API Key** auth: have your region and API key ready
 
 ### Input & Output Folders
 
@@ -227,179 +451,8 @@ output\presentation-narrated.pptx
 > **Audio mode:** The audio is embedded as a hidden narration element — it plays automatically  
 > when you advance to that slide in slideshow mode, just like PowerPoint's built-in Record Narration.
 >
-> **Avatar mode:** The avatar video is embedded as a visible video element on the top-right  
+> **Avatar mode:** The avatar video is embedded as a visible video element on the bottom-right  
 > corner of each slide. It also plays automatically when the slide is shown.
-
----
-
-## PowerShell Scripts — Manual TTS & Avatar
-
-The `ps-scripts/` folder contains standalone PowerShell scripts for calling the Azure AI Speech REST API directly. Use these when you want to batch-convert SSML files to audio or avatar video **outside of PowerPoint**.
-
-### SSML Input Files
-
-Place one or more `.xml` files in the `ps-scripts/ssml/` folder. Each file must contain valid [SSML](https://learn.microsoft.com/azure/ai-services/speech-service/speech-synthesis-markup-structure).
-
-Example (`ps-scripts/ssml/sample.xml`):
-
-```xml
-<speak version="1.0" xml:lang="en-US">
-  <voice name="en-US-JennyNeural">
-    <prosody rate="0%" pitch="0%">
-      Hello! This is a sample SSML file for Azure AI Speech text-to-speech.
-    </prosody>
-  </voice>
-</speak>
-```
-
-> A full list of available voices can be found in the [Voice Gallery](https://speech.microsoft.com/portal/voicegallery).
-
-### Text-to-Speech
-
-#### API Key Authentication
-
-Open `ps-scripts/text-to-speech-apikey.ps1` and set the two variables at the top:
-
-```powershell
-$region = "<YOUR-REGION>"       # e.g. "swedencentral"
-$apiKey = "<YOUR-API-KEY>"      # Key 1 or Key 2 from the Azure Portal
-```
-
-```powershell
-cd ps-scripts
-.\text-to-speech-apikey.ps1
-```
-
-#### Entra ID Authentication
-
-Open `ps-scripts/text-to-speech-entraid.ps1` and set the variable at the top:
-
-```powershell
-$resourceName = "<YOUR-SPEECH-RESOURCE-NAME>"   # e.g. "my-speech-resource"
-```
-
-```powershell
-cd ps-scripts
-.\text-to-speech-entraid.ps1
-```
-
-#### TTS Output
-
-Generated WAV files are saved in the `ps-scripts/audio/` folder with the same base name as the input SSML file:
-
-```
-ps-scripts/ssml/slide1.xml  →  ps-scripts/audio/slide1.wav
-ps-scripts/ssml/slide2.xml  →  ps-scripts/audio/slide2.wav
-```
-
-The default output format is `riff-16khz-16bit-mono-pcm` (16 kHz, 16-bit, mono PCM WAV).  
-You can change the `X-Microsoft-OutputFormat` header in the script to use a different format.  
-See [supported audio formats](https://learn.microsoft.com/azure/ai-services/speech-service/rest-text-to-speech#audio-outputs) for all options.
-
-A progress bar shows the current file and overall progress.  
-If a WAV file already exists, you will be prompted to choose:
-
-| Key | Action |
-|-----|--------|
-| **S** | Skip this file |
-| **O** | Overwrite this file |
-| **A** | Skip All remaining duplicates |
-| **L** | Overwrite All remaining duplicates |
-
-### Avatar Video
-
-The avatar scripts generate **talking avatar videos** — a photorealistic CG human speaking your SSML text.  
-They use the [Azure AI Speech Avatar Batch Synthesis API](https://learn.microsoft.com/azure/ai-services/speech-service/batch-synthesis-avatar) (asynchronous: submit job → poll status → download video).
-
-#### Avatar Types
-
-| Type | Description | `$avatarCustomized` | `$avatarStyle` |
-|---|---|---|---|
-| **Standard video avatar** | Pre-built characters with multiple styles (e.g. Lisa, Harry) at 1920×1080 | `$false` | Required |
-| **Standard photo avatar** | Pre-built photo-based characters (e.g. Adrian, Amara) at 512×512 | `$false` | Not needed (leave empty) |
-| **Custom photo avatar** | Your own avatar created from a real person's photo | `$true` | Not needed |
-
-#### Standard Video Avatars (with styles)
-
-| Character | Styles |
-|---|---|
-| Harry | business, casual, youthful |
-| Jeff | business, formal |
-| Lisa | casual-sitting, graceful-sitting, graceful-standing, technical-sitting, technical-standing |
-| Lori | casual, graceful, formal |
-| Max | business, casual, formal |
-| Meg | formal, casual, business |
-
-#### Standard Photo Avatars (no style needed)
-
-Adrian, Amara, Amira, Anika, Bianca, Camila, Carlos, Clara, Darius, Diego, Elise, Farhan, Faris, Gabrielle, Hyejin, Imran, Isabella, Layla, Liwei, Ling, Marcus, Matteo, Rahul, Rana, Ren, Riya, Sakura, Simone, Zayd, Zoe
-
-#### Custom Photo Avatar (from a real person's photo)
-
-Creating a custom photo avatar requires a manual process with Microsoft:
-
-1. **Apply for limited access** via the [intake form](https://aka.ms/customneural).
-2. **Record a consent video** — the real person shown in the photo must provide verbal consent.
-3. **Submit the photo and consent** to Microsoft, who will create the avatar model for you.
-4. Once Microsoft has created the model, use its name as `$avatarCharacter` and set `$avatarCustomized = $true`.
-
-> See [Custom text to speech avatar](https://learn.microsoft.com/azure/ai-services/speech-service/custom-avatar-create) for full details.
-
-#### API Key Authentication
-
-Open `ps-scripts/avatar-apikey.ps1` and set the variables at the top:
-
-```powershell
-$region          = "<YOUR-REGION>"      # e.g. "swedencentral"
-$apiKey          = "<YOUR-API-KEY>"     # Key 1 or Key 2
-$avatarCharacter = "lisa"               # Character name (see tables above)
-$avatarStyle     = "graceful-sitting"   # Style (video avatars only)
-$avatarCustomized = $false              # $true for custom photo avatar
-$videoFormat     = "mp4"                # "mp4" or "webm"
-$videoCodec      = "h264"              # "h264", "hevc", "vp9", or "av1"
-$backgroundColor = "#00000000"          # RRGGBBAA (transparent by default)
-$subtitleType    = "soft_embedded"      # "soft_embedded", "hard_embedded", "external_file", or "none"
-```
-
-```powershell
-cd ps-scripts
-.\avatar-apikey.ps1
-```
-
-#### Entra ID Authentication
-
-Requires the same Entra ID setup described in [Prerequisites](#entra-id-setup-optional).
-
-Open `ps-scripts/avatar-entraid.ps1` and set the variables at the top:
-
-```powershell
-$resourceName    = "<YOUR-SPEECH-RESOURCE-NAME>"
-$avatarCharacter = "lisa"
-$avatarStyle     = "graceful-sitting"
-$avatarCustomized = $false
-$videoFormat     = "mp4"
-$videoCodec      = "h264"
-$backgroundColor = "#00000000"
-$subtitleType    = "soft_embedded"
-```
-
-```powershell
-cd ps-scripts
-.\avatar-entraid.ps1
-```
-
-#### Avatar Output
-
-Generated videos are saved in the `ps-scripts/video/` folder:
-
-```
-ps-scripts/ssml/slide1.xml  →  ps-scripts/video/slide1.mp4
-ps-scripts/ssml/slide2.xml  →  ps-scripts/video/slide2.mp4
-```
-
-Both avatar scripts display a progress bar and prompt on duplicate files, just like the TTS scripts.
-
-> **Note:** Avatar batch synthesis is **asynchronous**. Each file submits a job and the script polls every 10 seconds until the video is ready. This is slower than TTS but produces video output.
 
 ---
 
