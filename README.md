@@ -366,8 +366,8 @@ dotnet build
 | `--region` | Azure region | — | Azure region of your Speech resource (e.g. `swedencentral`, `eastus`). **Required when `--auth apikey`**. |
 | `--api-key` | key string | — | API key (Key 1 or Key 2) from the Azure Portal. **Required when `--auth apikey`**. |
 | `--resource-name` | resource name | — | Name of your Azure Speech resource. **Required when `--auth entraid`**. |
-| `--avatar-character` | character name | `lisa` | Avatar character to use (avatar mode only). See the avatar character tables above. |
-| `--avatar-style` | style name | `graceful-sitting` | Avatar style (avatar mode only, for standard video avatars). Leave default for photo avatars. |
+| `--avatar-character` | character name | `lisa` | Avatar character to use (avatar mode only). See [available avatar characters](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/text-to-speech-avatar/standard-avatars). |
+| `--avatar-style` | style name | `graceful-sitting` | Avatar style (avatar mode only, for standard video avatars). See [available avatar styles](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/text-to-speech-avatar/standard-avatars). Leave default for photo avatars. |
 | `--output` | file path | `output/<name>-narrated.pptx` | Custom path for the output file. If omitted, the narrated file is saved to the `output/` folder. |
 
 ### Example Commands
