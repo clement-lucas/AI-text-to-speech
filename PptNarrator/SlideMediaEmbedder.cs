@@ -132,9 +132,7 @@ static class SlideMediaEmbedder
                         new ChildTimeNodeList(
                             // Empty main sequence (required by PowerPoint)
                             new SequenceTimeNode(
-                                new CommonTimeNode(
-                                    new ChildTimeNodeList()
-                                ) { Id = 3, Duration = "indefinite", NodeType = TimeNodeValues.MainSequence },
+                                new CommonTimeNode() { Id = 3, Duration = "indefinite", NodeType = TimeNodeValues.MainSequence },
                                 new PreviousConditionList(
                                     new Condition(new TargetElement(new SlideTarget()))
                                     { Event = TriggerEventValues.OnPrevious, Delay = "0" }),
@@ -282,9 +280,7 @@ static class SlideMediaEmbedder
                         new ChildTimeNodeList(
                             // Empty main sequence (required by PowerPoint)
                             new SequenceTimeNode(
-                                new CommonTimeNode(
-                                    new ChildTimeNodeList()
-                                ) { Id = 3, Duration = "indefinite", NodeType = TimeNodeValues.MainSequence },
+                                new CommonTimeNode() { Id = 3, Duration = "indefinite", NodeType = TimeNodeValues.MainSequence },
                                 new PreviousConditionList(
                                     new Condition(new TargetElement(new SlideTarget()))
                                     { Event = TriggerEventValues.OnPrevious, Delay = "0" }),
